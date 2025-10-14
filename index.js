@@ -13,10 +13,28 @@ app.get('/',(req,res)=>{
         res.render('index',{files:files})
     });
 })
+app.get('/files/:filename', (req, res) => {
+    fs.readFile(`./files/${req.params.filename}`, "utf-8", (err, filedata) => {
+        if (err) return res.send("Error reading file");
+        res.render('show', { filename: req.params.filename, filedata: filedata });
+    });
+});
+app.get('/edit/:filename', (req, res) => {
+    fs.readFile(`./files/${req.params.filename}`, "utf-8", (err, filedata) => {
+        if (err) return res.send("Error reading file");
+        res.render('edit', { filename: req.params.filename });
+    });
+});
 
 app.post('/create',(req,res)=>{
     fs.writeFile(`./files/${req.body.title.split(' ').join('')}.txt`,req.body.description,(err)=>{
         if (err) return res.send('Error creating file');
+        res.redirect('/')
+    })
+})
+
+app.post('/edit',(req,res)=>{
+    fs.rename(`./files/${req.body.previous}`,`./files/${req.body.new}`,(err)=>{
         res.redirect('/')
     })
 })
